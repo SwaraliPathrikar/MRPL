@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRPL - Integrated Security Command & Control Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>MRPL ISCC</h1>
+            <span class="subtitle">Integrated Security Command & Control System - Dashboard Template</span>
+        </div>
+        <div class="header-info">
+            <span id="currentTime"></span>
+            <span class="user-info">Command Center | AxxonSoft VMS Integration</span>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="showDashboard('availability')">AVAILABILITY</button>
+        <button class="tab-btn" onclick="showDashboard('functional')">FUNCTIONAL</button>
+        <button class="tab-btn" onclick="showDashboard('reports')">REPORTS</button>
+    </nav>
+
+    <!-- DASHBOARD 1: AVAILABILITY -->
+    <div id="availability" class="dashboard-content active">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon">📹</div>
+                <div class="kpi-value" id="totalCameras">-</div>
+                <div class="kpi-label">Total Cameras</div>
+            </div>
+            <div class="kpi-card status-good">
+                <div class="kpi-icon">✓</div>
+                <div class="kpi-value" id="onlineCameras">-</div>
+                <div class="kpi-label">Online Cameras</div>
+            </div>
+            <div class="kpi-card status-warning">
+                <div class="kpi-icon">⚠</div>
+                <div class="kpi-value" id="offlineCameras">-</div>
+                <div class="kpi-label">Offline Cameras</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🚗</div>
+                <div class="kpi-value" id="anprStatus">-</div>
+                <div class="kpi-label">ANPR Working</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">👤</div>
+                <div class="kpi-value" id="frStatus">-</div>
+                <div class="kpi-label">Face Recognition</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">💾</div>
+                <div class="kpi-value" id="storageUsage">67%</div>
+                <div class="kpi-label">SAN Storage Usage</div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Device Status by Category</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <button class="btn-action" style="padding: 8px 15px; font-size: 14px;" onclick="showCategoryStatus('Cameras')">Cameras</button>
+                    <button class="btn-action" style="padding: 8px 15px; font-size: 14px;" onclick="showCategoryStatus('Access Control')">Access Control</button>
+                    <button class="btn-action" style="padding: 8px 15px; font-size: 14px;" onclick="showCategoryStatus('Displays')">Displays</button>
+                    <button class="btn-action" style="padding: 8px 15px; font-size: 14px;" onclick="showCategoryStatus('Readers')">Readers</button>
+                    <button class="btn-action" style="padding: 8px 15px; font-size: 14px;" onclick="showCategoryStatus('Security Equipment')">Security</button>
+                    <button class="btn-action" style="padding: 8px 15px; font-size: 14px;" onclick="showCategoryStatus('Infrastructure')">Infrastructure</button>
+                </div>
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <strong id="selectedCategory" style="color: #00d4ff; font-size: 1.2rem;">Cameras</strong>
+                </div>
+                <canvas id="deviceStatusChart"></canvas>
+            </div>
+            <div class="card">
+                <h3>Gate-wise Device Health</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Gate</th>
+                            <th>Cameras</th>
+                            <th>ANPR</th>
+                            <th>Bollards</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Main Gate</td>
+                            <td>20/20</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td><span class="status-badge good">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>Cargo Gate</td>
+                            <td>18/20</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td><span class="status-badge warning">WARNING</span></td>
+                        </tr>
+                        <tr>
+                            <td>LP Gate</td>
+                            <td>15/15</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td><span class="status-badge good">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>Phase 3 Gate</td>
+                            <td>12/12</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td><span class="status-badge good">ONLINE</span></td>
+                        </tr>
+                        <tr>
+                            <td>Railway Siding</td>
+                            <td>10/10</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td><span class="status-badge good">ONLINE</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Weekly Uptime Trend</h3>
+                <canvas id="uptimeTrendChart"></canvas>
+            </div>
+            <div class="card alert-panel">
+                <h3>🚨 Live Alerts</h3>
+                <div class="alert-list">
+                    <div class="alert-item critical">
+                        <span class="alert-time">14:23</span>
+                        <span class="alert-msg">Camera disconnected - Cargo Gate Cam-05</span>
+                    </div>
+                    <div class="alert-item warning">
+                        <span class="alert-time">13:45</span>
+                        <span class="alert-msg">Storage usage above 65% - Primary SAN</span>
+                    </div>
+                    <div class="alert-item info">
+                        <span class="alert-time">12:10</span>
+                        <span class="alert-msg">Scheduled maintenance - Phase 3 Gate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>� Device Analytics & Distribution</h3>
+            <div class="grid-3">
+                <div style="background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+                    <canvas id="deviceCategoryChart"></canvas>
+                </div>
+                <div style="background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+                    <canvas id="topDevicesChart"></canvas>
+                </div>
+                <div style="background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 8px;">
+                    <canvas id="gateDeviceDistChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>📋 Complete Device Inventory</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="deviceSearch" placeholder="🔍 Search devices..." style="
+                    width: 100%;
+                    padding: 12px;
+                    background: #0a0e27;
+                    border: 2px solid #3d4a7a;
+                    border-radius: 8px;
+                    color: #e0e0e0;
+                    font-size: 16px;
+                " onkeyup="filterDevices()">
+            </div>
+            
+            <div style="overflow-x: auto; max-height: 600px; overflow-y: auto;">
+                <table class="data-table" id="fullInventoryTable">
+                    <thead style="position: sticky; top: 0; background: #2d3561; z-index: 10;">
+                        <tr>
+                            <th style="min-width: 250px;">Device Type</th>
+                            <th>Total</th>
+                            <th style="min-width: 600px;">Gate-wise Distribution</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <tr>
+                            <td colspan="3" style="text-align: center; padding: 40px;">
+                                <div style="font-size: 18px; color: #8b9dc3;">
+                                    🔄 Loading device inventory...
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0, 212, 255, 0.1); border-radius: 8px; border-left: 4px solid #00d4ff;">
+                <strong style="color: #00d4ff;">📊 Summary:</strong>
+                <span id="inventorySummary" style="color: #e0e0e0; margin-left: 10px;">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD 2: FUNCTIONAL -->
+    <div id="functional" class="dashboard-content">
+        <div class="kpi-grid">
+            <div class="kpi-card highlight">
+                <div class="kpi-icon">📥</div>
+                <div class="kpi-value live-counter" id="totalEntries">1,250</div>
+                <div class="kpi-label">Total Entries Today</div>
+            </div>
+            <div class="kpi-card highlight">
+                <div class="kpi-icon">📤</div>
+                <div class="kpi-value live-counter" id="totalExits">1,180</div>
+                <div class="kpi-label">Total Exits Today</div>
+            </div>
+            <div class="kpi-card status-good highlight">
+                <div class="kpi-icon">👥</div>
+                <div class="kpi-value live-counter" id="currentlyInside">420</div>
+                <div class="kpi-label">Currently Inside</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🚗</div>
+                <div class="kpi-value" id="vehicleEntries">285</div>
+                <div class="kpi-label">Vehicle Entries</div>
+            </div>
+            <div class="kpi-card status-warning">
+                <div class="kpi-icon">⚠</div>
+                <div class="kpi-value" id="violations">12</div>
+                <div class="kpi-label">Violations Today</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🅿</div>
+                <div class="kpi-value" id="parkingOccupancy">78%</div>
+                <div class="kpi-label">Parking Occupancy</div>
+            </div>
+        </div>
+
+        <div class="grid-3">
+            <div class="card">
+                <h3>Person Category Breakdown</h3>
+                <canvas id="personCategoryChart"></canvas>
+            </div>
+            <div class="card">
+                <h3>Gender Analytics</h3>
+                <canvas id="genderChart"></canvas>
+            </div>
+            <div class="card">
+                <h3>Vehicle Type Distribution</h3>
+                <canvas id="vehicleTypeChart"></canvas>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Gate-wise Movement Analytics</h3>
+                <canvas id="gateMovementChart"></canvas>
+            </div>
+            <div class="card">
+                <h3>Parking Status</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Parking Zone</th>
+                            <th>Capacity</th>
+                            <th>Occupied</th>
+                            <th>Available</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Car Parking</td>
+                            <td>200</td>
+                            <td>168</td>
+                            <td>32</td>
+                            <td>84%</td>
+                        </tr>
+                        <tr>
+                            <td>Bike Parking</td>
+                            <td>350</td>
+                            <td>290</td>
+                            <td>60</td>
+                            <td>83%</td>
+                        </tr>
+                        <tr>
+                            <td>Truck Bay</td>
+                            <td>40</td>
+                            <td>36</td>
+                            <td>4</td>
+                            <td>90%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>⚠ Safety Violation Analytics</h3>
+            <div class="violation-grid">
+                <div class="violation-card">
+                    <div class="violation-count">8</div>
+                    <div class="violation-label">Speed Violations</div>
+                </div>
+                <div class="violation-card">
+                    <div class="violation-count">3</div>
+                    <div class="violation-label">No Helmet</div>
+                </div>
+                <div class="violation-card">
+                    <div class="violation-count">1</div>
+                    <div class="violation-label">No PPE Kit</div>
+                </div>
+                <div class="violation-card">
+                    <div class="violation-count">0</div>
+                    <div class="violation-label">Unauthorized Entry</div>
+                </div>
+                <div class="violation-card">
+                    <div class="violation-count">0</div>
+                    <div class="violation-label">Tailgating</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD 3: INCIDENT & COMMAND -->
+    <div id="incident" class="dashboard-content">
+        <div class="kpi-grid">
+            <div class="kpi-card status-critical">
+                <div class="kpi-icon">🚨</div>
+                <div class="kpi-value" id="openIncidents">2</div>
+                <div class="kpi-label">Open Incidents</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🔍</div>
+                <div class="kpi-value" id="investigating">3</div>
+                <div class="kpi-label">Under Investigation</div>
+            </div>
+            <div class="kpi-card status-good">
+                <div class="kpi-icon">✓</div>
+                <div class="kpi-value" id="closedToday">8</div>
+                <div class="kpi-label">Closed Today</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">⏱</div>
+                <div class="kpi-value" id="avgResponseTime">4.2m</div>
+                <div class="kpi-label">Avg Response Time</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🚨 Live Incident Panel</h3>
+            <table class="data-table incident-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Gate</th>
+                        <th>Time</th>
+                        <th>Assigned Officer</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="incident-critical">
+                        <td>#INC-2026-045</td>
+                        <td>Speed Violation</td>
+                        <td>Main Gate</td>
+                        <td>14:35</td>
+                        <td>Officer Ramesh</td>
+                        <td><span class="status-badge critical">OPEN</span></td>
+                        <td><button class="btn-action">View</button></td>
+                    </tr>
+                    <tr class="incident-warning">
+                        <td>#INC-2026-044</td>
+                        <td>No PPE Kit</td>
+                        <td>Cargo Gate</td>
+                        <td>13:20</td>
+                        <td>Officer Suresh</td>
+                        <td><span class="status-badge warning">INVESTIGATING</span></td>
+                        <td><button class="btn-action">View</button></td>
+                    </tr>
+                    <tr>
+                        <td>#INC-2026-043</td>
+                        <td>Visitor Overstay</td>
+                        <td>LP Gate</td>
+                        <td>12:45</td>
+                        <td>Officer Prakash</td>
+                        <td><span class="status-badge good">CLOSED</span></td>
+                        <td><button class="btn-action">View</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Emergency Alerts</h3>
+                <div class="emergency-grid">
+                    <div class="emergency-btn safe">
+                        <div class="emergency-icon">🔔</div>
+                        <div class="emergency-label">Panic Button</div>
+                        <div class="emergency-status">No Alert</div>
+                    </div>
+                    <div class="emergency-btn safe">
+                        <div class="emergency-icon">🚧</div>
+                        <div class="emergency-label">Perimeter Breach</div>
+                        <div class="emergency-status">Secure</div>
+                    </div>
+                    <div class="emergency-btn safe">
+                        <div class="emergency-icon">🔒</div>
+                        <div class="emergency-label">Unauthorized Access</div>
+                        <div class="emergency-status">No Alert</div>
+                    </div>
+                    <div class="emergency-btn safe">
+                        <div class="emergency-icon">🔥</div>
+                        <div class="emergency-label">Fire Alarm</div>
+                        <div class="emergency-status">Normal</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>SLA Monitoring (CAMC)</h3>
+                <div class="sla-metrics">
+                    <div class="sla-item">
+                        <div class="sla-label">Mean Time To Repair (MTTR)</div>
+                        <div class="sla-value good">2.3 hrs</div>
+                        <div class="sla-target">Target: < 4 hrs</div>
+                    </div>
+                    <div class="sla-item">
+                        <div class="sla-label">System Uptime %</div>
+                        <div class="sla-value good">99.2%</div>
+                        <div class="sla-target">Target: > 98%</div>
+                    </div>
+                    <div class="sla-item">
+                        <div class="sla-label">Vendor Response Time</div>
+                        <div class="sla-value good">18 mins</div>
+                        <div class="sla-target">Target: < 30 mins</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD 3: REPORTS -->
+    <div id="reports" class="dashboard-content">
+        <div class="card">
+            <h3>📊 MRPL Security Reports</h3>
+            <div class="reports-grid">
+                <div class="report-card" onclick="generateReport('daily')">
+                    <div class="report-icon">📋</div>
+                    <div class="report-title">Daily Security Report</div>
+                    <div class="report-desc">Entry/Exit, Visitors, Violations, Gate-wise Summary</div>
+                </div>
+                <div class="report-card" onclick="generateReport('speed')">
+                    <div class="report-icon">🚗</div>
+                    <div class="report-title">Speed Violation Report</div>
+                    <div class="report-desc">Vehicle No, Speed, Location, Snapshots, Time</div>
+                </div>
+                <div class="report-card" onclick="generateReport('blacklist')">
+                    <div class="report-icon">🚫</div>
+                    <div class="report-title">Blacklisted Vehicle Alert</div>
+                    <div class="report-desc">Attempted entries, ANPR Alerts, Action Taken</div>
+                </div>
+                <div class="report-card" onclick="generateReport('contractor')">
+                    <div class="report-icon">👷</div>
+                    <div class="report-title">Contractor Attendance</div>
+                    <div class="report-desc">In/Out time, Total hours, Overtime, Biometric</div>
+                </div>
+                <div class="report-card" onclick="generateReport('visitor')">
+                    <div class="report-icon">👤</div>
+                    <div class="report-title">Visitor Management</div>
+                    <div class="report-desc">Visitor logs, Overstay cases, Gate-wise entry</div>
+                </div>
+                <div class="report-card" onclick="generateReport('access')">
+                    <div class="report-icon">🔐</div>
+                    <div class="report-title">Access Denied Report</div>
+                    <div class="report-desc">Unauthorized attempts, Face mismatch, Card issues</div>
+                </div>
+                <div class="report-card" onclick="generateReport('downtime')">
+                    <div class="report-icon">⚙</div>
+                    <div class="report-title">System Downtime (CAMC)</div>
+                    <div class="report-desc">Device failures, MTTR, Vendor response, SLA</div>
+                </div>
+                <div class="report-card" onclick="generateReport('gate')">
+                    <div class="report-icon">🚪</div>
+                    <div class="report-title">Gate Performance Report</div>
+                    <div class="report-desc">Traffic analysis, Peak hours, Throughput</div>
+                </div>
+                <div class="report-card" onclick="generateReport('incident')">
+                    <div class="report-icon">🚨</div>
+                    <div class="report-title">Incident & Alert Report</div>
+                    <div class="report-desc">Security incidents, Response time, Resolution</div>
+                </div>
+                <div class="report-card" onclick="generateReport('ppe')">
+                    <div class="report-icon">🦺</div>
+                    <div class="report-title">PPE Compliance Report</div>
+                    <div class="report-desc">Helmet detection, Safety gear violations</div>
+                </div>
+                <div class="report-card" onclick="generateReport('parking')">
+                    <div class="report-icon">🅿</div>
+                    <div class="report-title">Parking Utilization</div>
+                    <div class="report-desc">Occupancy, Duration, Zone-wise analysis</div>
+                </div>
+                <div class="report-card" onclick="generateReport('analytics')">
+                    <div class="report-icon">📈</div>
+                    <div class="report-title">Security Analytics</div>
+                    <div class="report-desc">Trends, Patterns, Predictive insights, KPIs</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-top: 20px;">
+            <h3>📅 Report Scheduling & Export</h3>
+            <div style="padding: 20px;">
+                <p style="margin-bottom: 15px; color: #8b9dc3;">Configure automated report generation and distribution</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <button class="btn-action" style="width: 100%; padding: 15px;">Daily Auto-Reports</button>
+                    <button class="btn-action" style="width: 100%; padding: 15px;">Weekly Summary</button>
+                    <button class="btn-action" style="width: 100%; padding: 15px;">Monthly Analytics</button>
+                    <button class="btn-action" style="width: 100%; padding: 15px;">Export to Excel</button>
+                    <button class="btn-action" style="width: 100%; padding: 15px;">Export to PDF</button>
+                    <button class="btn-action" style="width: 100%; padding: 15px;">Email Reports</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
