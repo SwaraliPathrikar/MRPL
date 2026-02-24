@@ -1,0 +1,13 @@
+        <!-- ALL DEVICES STATUS CARDS -->
+        <div style="margin-top: 2rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <div onclick="toggleDeviceGrid()" id="toggleGridBtn" style="cursor: pointer; font-size: 2.5rem; color: #00d4ff; transition: all 0.3s; padding: 10px;" title="Click to expand/collapse">☰</div>
+            <div style="text-align: center; flex: 1;">
+                <h2 style="color: #00d4ff; font-size: 1.5rem; margin-bottom: 0.5rem;">📊 Complete Device Inventory Status</h2>
+                <p style="color: #8b9dc3; font-size: 0.9rem;">Click any card to view detailed breakdown by gate and download reports</p>
+            </div>
+            <div style="width: 60px;"></div>
+        </div>
+        
+        <div id="allDevicesGrid" class="devices-grid">
+            <!-- Device cards will be dynamically generated here -->
+        </div>
